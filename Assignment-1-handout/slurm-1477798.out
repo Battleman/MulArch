@@ -1,0 +1,19 @@
+STARTING PI AT lun oct 9 14:32:36 CEST 2017
+- Using 1 threads: pi = 3.1416182976 computed in 107.7s.
+- Using 2 threads: pi = 3.141612556 computed in 55.12s.
+- Using 4 threads: pi = 3.14162026 computed in 29.22s.
+- Using 8 threads: pi = 3.1415988768 computed in 15.11s.
+- Using 16 threads: pi = 3.141585184 computed in 7.735s.
+- Using 32 threads: pi = 3.1415706528 computed in 6.09s.
+- Using 48 threads: pi = 3.141556028 computed in 5.587s.
+- Using 64 threads: pi = 3.141559812 computed in 5.316s.
+END PI START INTEGRAL at lun oct 9 14:36:28 CEST 2017
+- Using 1 threads: integral on [5,9] = 28.1716962443486 computed in 3.5e-05s.
+- Using 2 threads: integral on [5,9] = 28.0659488703329 computed in 9.4e-05s.
+- Using 4 threads: integral on [5,9] = 28.0368559513939 computed in 0.000124s.
+- Using 8 threads: integral on [5,9] = 28.0693095851296 computed in 0.000245s.
+- Using 16 threads: integral on [5,9] = 28.0114492222167 computed in 0.000495s.
+- Using 32 threads: integral on [5,9] = 27.7574095337336 computed in 0.000798s.
+- Using 48 threads: integral on [5,9] = 27.4988077526162 computed in 0.001268s.
+- Using 64 threads: integral on [5,9] = 27.7836256822032 computed in 0.001721s.
+END INTEGRAL at lun oct 9 14:36:28 CEST 2017
