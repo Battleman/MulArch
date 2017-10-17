@@ -10,6 +10,16 @@ SCIPER		: 236079
 #define output(i,j) output[(i)*length+(j)]
 #define src(i,j) src[(i)*length+(j)]
 
+double newmean(double* src, size_t row, size_t col, int length){
+    if(row == col && row == length/2-1){
+        return src(row, col);
+    } else {
+        return (src(row-1,col-1)+src(row-1,col)+src(row-1,col+1)+
+        src(row,col-1) + src(row,col) + src(row,col+1)+
+        src(row+1,col-1)+src(row+1,col)+src(row+1,col+1))/9;
+    }
+}
+
 double mean_(double* src, size_t row, size_t col, int length){
     double sum = 0.0;
     if(row == col){
@@ -56,7 +66,7 @@ double mean_(double* src, size_t row, size_t col, int length){
     return sum/9;
 }
 
-void simulate_(double *input, double *output, int threads, int length, int iterations)
+void simulate(double *input, double *output, int threads, int length, int iterations)
 {
     double mean = 0.0;
     omp_set_num_threads(threads);
@@ -68,7 +78,7 @@ void simulate_(double *input, double *output, int threads, int length, int itera
             for(size_t col = 1; col <= row; col++)
             {
                 if(i%2 == 0){
-                    mean = mean_(input, row, col, length);
+                    mean = newmean(input, row, col, length);
                     output(row, col) = mean;
                     output(length-1-row, col) = mean;
                     output(row, length-1-col) = mean;
@@ -100,7 +110,7 @@ void simulate_(double *input, double *output, int threads, int length, int itera
     }
 }
 
-void simulate(double *input, double *output, int threads, int length, int iterations)
+void simulate_(double *input, double *output, int threads, int length, int iterations)
 {
     omp_set_num_threads(threads);
     for (size_t i = 0; i < iterations; i++) {
