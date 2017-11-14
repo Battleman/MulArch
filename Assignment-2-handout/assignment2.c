@@ -38,28 +38,138 @@ int main (int argc, const char *argv[]) {
       printf("No memory could be allocated");
       return -1;
     }
+
+
+    // /*##################
+    // *####  eigth_switch #####
+    // *##################*/
+    // //Initialize the array
+    // init(input, length);
+    // init(output, length);
+    // //Start timer
+    // set_clock();
+    // //Optimize the following function
+    // eighth_switch(input, output, threads, length, iterations);
+    // //Stop timer
+    // time = elapsed_time();
+    // //Report time required for n iterations
+    // printf("Running the algorithm EIGTH_SWITCH with %d threads on %d by %d array for %d iteration takes %.4gs seconds \n", threads, length, length, iterations, time);
+    // //Save array in filelength
+    // save(output, length, "output_eigth_switch.csv");
+
+
+    // /*##################
+    // *####  half_vertical_switch #####
+    // *##################*/
+    // //Initialize the array
+    // init(input, length);
+    // init(output, length);
+    // //Start timer
+    // set_clock();
+    // //Optimize the following function
+    // half_vertical_switch(input, output, threads, length, iterations);
+    // //Stop timer
+    // time = elapsed_time();
+    // //Report time required for n iterations
+    // printf("Running the algorithm HALF_VERTICAL_SWITCH with %d threads on %d by %d array for %d iteration takes %.4gs seconds \n", threads, length, length, iterations, time);
+    // //Save array in filelength
+    // save(output, length, "output_half_vertical_switch.csv");
+    //
+    //
+    // /*##################
+    // *####  half_horizontal_switch #####
+    // *##################*/
+    // //Initialize the array
+    // init(input, length);
+    // init(output, length);
+    // //Start timer
+    // set_clock();
+    // //Optimize the following function
+    // half_horizontal_switch(input, output, threads, length, iterations);
+    // //Stop timer
+    // time = elapsed_time();
+    // //Report time required for n iterations
+    // printf("Running the algorithm HALF_HORIZONTAL_SWITCH with %d threads on %d by %d array for %d iteration takes %.4gs seconds \n", threads, length, length, iterations, time);
+    // //Save array in filelength
+    // save(output, length, "output_half_horizontal_switch.csv");
+    //
+    //
+    // /*##################
+    // *####  whole_switch #####
+    // *##################*/
+    // //Initialize the array
+    // init(input, length);
+    // init(output, length);
+    // //Start timer
+    // set_clock();
+    // //Optimize the following function
+    // whole_switch(input, output, threads, length, iterations);
+    // //Stop timer
+    // time = elapsed_time();
+    // //Report time required for n iterations
+    // printf("Running the algorithm WHOLE_SWITCH with %d threads on %d by %d array for %d iteration takes %.4gs seconds \n", threads, length, length, iterations, time);
+    // //Save array in filelength
+    // save(output, length, "output_whole_switch.csv");
+    //
+    //
+    // /*#########################
+    // *####  whole_noSwitch #####
+    // *##########################*/
+    // //Initialize the array
+    // init(input, length);
+    // init(output, length);
+    // //Start timer
+    // set_clock();
+    // //Optimize the following function
+    // whole_noSwitch(input, output, threads, length, iterations);
+    // //Stop timer
+    // time = elapsed_time();
+    // //Report time required for n iterations
+    // printf("Running the algorithm WHOLE_NOSWITCH with %d threads on %d by %d array for %d iteration takes %.4gs seconds \n", threads, length, length, iterations, time);
+    // //Save array in filelength
+    // save(output, length, "output_whole_noSwitch.csv");
+    //
+    // /*##################
+    // *####  QUARTER #####
+    // *##################*/
+    // //Initialize the array
+    // init(input, length);
+    // init(output, length);
+    // //Start timer
+    // set_clock();
+    // //Optimize the following function
+    // whole_noSwitch(input, output, threads, length, iterations);
+    // //Stop timer
+    // time = elapsed_time();
+    // //Report time required for n iterations
+    // printf("Running the algorithm QUARTER_SWITCH with %d threads on %d by %d array for %d iteration takes %.4gs seconds \n", threads, length, length, iterations, time);
+    // //Save array in filelength
+    // save(output, length, "output_quarter_switch.csv");
+
+
+    /*###################
+    *####  simulate #####
+    *###################*/
     //Initialize the array
     init(input, length);
     init(output, length);
-
     //Start timer
     set_clock();
-    
     //Optimize the following function
     simulate(input, output, threads, length, iterations);
-
     //Stop timer
-    time = elapsed_time();
-
     //Report time required for n iterations
-    printf("Running the algorithm with %d threads on %d by %d array for %d iteration takes %.4gs seconds \n", threads, length, length, iterations, time);
-
+    time = elapsed_time();
+    printf("Running the algorithm SIMULATE with %d threads on %d by %d array for %d iteration takes %.4gs seconds \n", threads, length, length, iterations, time);
     //Save array in filelength
     save(output, length, argv[4]);
+
+
 
     //Free allocated memory
     free(input);
     free(output);
+
 
     return 0;
 }

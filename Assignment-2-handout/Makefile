@@ -1,6 +1,6 @@
 
 CC = gcc
-CFLAGS = -std=gnu99 -O3 -fopenmp -Wall
+CFLAGS = -g -std=gnu99 -O3 -fopenmp -Wall
 
 all: assignment2
 
