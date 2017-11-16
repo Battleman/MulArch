@@ -1,7 +1,7 @@
 /*
  ============================================================================
  Filename    : assignment3.c
- Author      : Arash Pourhabibi [Replace it with your name and SCIPER ID]
+ Author      : Olivier Cloux 236079
  Date        : Nov. 13th, 2017
  ============================================================================
  */
@@ -9,10 +9,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <omp.h>
 
 typedef struct node {
     int val;
     struct node *next;
+    omp_lock_t lock;
 } node_t;
 
 
@@ -21,9 +23,10 @@ typedef struct node {
  */
 void init_list(node_t **head, int val) {
     (*head) = malloc(sizeof(node_t));
-    
+
     (*head)->val = val;
     (*head)->next = NULL;
+    omp_init_lock(&((*head)->lock));
 }
 
 /*
@@ -31,7 +34,7 @@ void init_list(node_t **head, int val) {
  */
 void print_list(node_t *head) {
     node_t *current = head;
-    
+
     while (current != NULL) {
         printf("%d\n", current->val);
         current = current->next;
@@ -45,12 +48,12 @@ int count(node_t *head)
 {
     node_t *current = head;
     int count = 0;
-    
+
     while (current != NULL) {
         count++;
         current = current->next;
     }
-    
+
     return count;
 }
 
@@ -59,11 +62,12 @@ int count(node_t *head)
  */
 void append(node_t *head, int val) {
     node_t *current = head;
+
     while (current->next != NULL) {
         current = current->next;
     }
-    
-    
+
+
     current->next = malloc(sizeof(node_t));
     current->next->val = val;
     current->next->next = NULL;
@@ -75,7 +79,7 @@ void append(node_t *head, int val) {
 void add_first(node_t **head, int val) {
     node_t *new_node;
     new_node = malloc(sizeof(node_t));
-    
+
     new_node->val = val;
     new_node->next = *head;
     *head = new_node;
@@ -90,22 +94,22 @@ int insert(node_t **head, int val, int index) {
         add_first(head, val);
         return 0;
     }
-    
+
     node_t * current = *head;
-    
+
     for (int i = 0; i < index-1; i++) {
         if (current->next == NULL) {
             return -1;
         }
         current = current->next;
     }
-    
+
     node_t *new_node;
     new_node = malloc(sizeof(node_t));
     new_node->val = val;
     new_node->next = current->next;
     current->next = new_node;
-    
+
     return 0;
 }
 
@@ -116,16 +120,15 @@ int insert(node_t **head, int val, int index) {
 int pop(node_t **head) {
     int retval = -1;
     node_t* next_node = NULL;
-    
     if (*head == NULL) {
         return -1;
     }
-    
+
     next_node = (*head)->next;
     retval = (*head)->val;
     free(*head);
     *head = next_node;
-    
+
     return retval;
 }
 
@@ -134,27 +137,27 @@ int pop(node_t **head) {
  * The value of that element is returned if the list is long enough; otherwise it returns -1.
  */
 int remove_by_index(node_t **head, int index) {
-    
+
     if (index == 0) {
         return pop(head);
     }
-    
+
     int retval = -1;
     node_t * current = *head;
     node_t * temp_node = NULL;
-    
+
     for (int i = 0; i < index-1; i++) {
         if (current->next == NULL) {
             return -1;
         }
         current = current->next;
     }
-    
+
     temp_node = current->next;
     retval = temp_node->val;
     current->next = temp_node->next;
     free(temp_node);
-    
+
     return retval;
 }
 
@@ -164,26 +167,33 @@ int remove_by_index(node_t **head, int index) {
  */
 int remove_by_value(node_t **head, int val) {
     node_t *previous, *current;
-    
+
     if (*head == NULL) {
         return -1;
     }
-    
+    omp_set_lock(&((*head)->lock));
+
     if ((*head)->val == val) {
+        omp_unset_lock(&((*head)->lock));
         return pop(head);
     }
-    
+
     previous = *head;
     current = (*head)->next;
-    while (current) {
+    omp_set_lock(&(current->lock));
+    while (current != NULL) {
         if (current->val == val) {
             previous->next = current->next;
+            //free the element and locks, now that the operation has been done
+            omp_unset_lock(&(current->lock));
             free(current);
+            omp_unset_lock(&(previous->lock));
             return val;
         }
-        
+        omp_unset_lock(&(previous->lock));
         previous = current;
         current  = current->next;
+        omp_set_lock(&(current->lock));
     }
     return -1;
 }
@@ -195,20 +205,20 @@ int remove_by_value(node_t **head, int val) {
 int search_by_value(node_t *head, int val) {
     node_t *current = head;
     int index = 0;
-    
+
     if (current == NULL) {
         return -1;
     }
-    
+
     while (current) {
         if (current->val == val) {
             return index;
         }
-        
+
         current  = current->next;
         index++;
     }
-    
+
     return -1;
 }
 
@@ -218,7 +228,7 @@ int search_by_value(node_t *head, int val) {
 void delete_list(node_t *head) {
     node_t *current = head;
     node_t *next;
-    
+
     while (current) {
         next = current->next;
         free(current);
@@ -227,12 +237,19 @@ void delete_list(node_t *head) {
 }
 
 int main(void) {
-    
+    // omp_lock_t head_lock, tail_lock, tail_lock;
+    // omp_init_lock(head_lock);
+    // omp_init_lock(middle_lock);
+    // omp_init_lock(tail_lock);
+
+    omp_lock_t head_lock;
+    omp_init_lock(&head_lock);
+
     node_t *test_list;
     init_list(&test_list, 2);
-    
+
     add_first(&test_list, 1);
-    
+
     append(test_list, 3);
     append(test_list, 4);
     append(test_list, 5);
@@ -240,13 +257,13 @@ int main(void) {
     printf("Count = %d\n", count(test_list));
     remove_by_index(&test_list, 2);
     printf("Count = %d\n", count(test_list));
-    
+
     printf("Search for 5 -> index = %d\n", search_by_value(test_list, 5));
     remove_by_value(&test_list, 5);
     printf("Search for 5 -> index = %d\n", search_by_value(test_list, 5));
-    
+
     print_list(test_list);
     delete_list(test_list);
-    
+
     return 0;
 }
