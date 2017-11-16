@@ -61,16 +61,23 @@ int count(node_t *head)
  * This function appends a new given element to the end of a given linked list.
  */
 void append(node_t *head, int val) {
+    if(NULL == head || -1 == val){
+        //avoids SEGFAULT and confusion between value and errcode.
+        return;
+    }
     node_t *current = head;
 
-    while (current->next != NULL) {
+    while (NULL != current->next) {
         current = current->next;
     }
-
-
+    omp_set_lock(&(current->lock));
     current->next = malloc(sizeof(node_t));
+    if(NULL == current->next){
+        return;
+    }
     current->next->val = val;
     current->next->next = NULL;
+    omp_unset_lock(&(current->lock))
 }
 
 /*
@@ -79,17 +86,23 @@ void append(node_t *head, int val) {
 void add_first(node_t **head, int val) {
     node_t *new_node;
     new_node = malloc(sizeof(node_t));
-
+    if(NULL == new_node){
+        return;
+    }
     new_node->val = val;
     new_node->next = *head;
     *head = new_node;
 }
 
 /*
- * This function inserts a new given element at the specified position of a given linked list.
+ * This function inserts a new given element (different than -1) at the specified position of a given linked list.
  * It returns 0 on a successful insertion, and -1 if the list is not long enough.
  */
 int insert(node_t **head, int val, int index) {
+    if(NULL == head || NULL == *head || -1 == val){
+        //avoid SEGFAULT and confusion between a value and the errcode -1
+        return -1;
+    }
     if (index == 0) {
         add_first(head, val);
         return 0;
@@ -106,6 +119,10 @@ int insert(node_t **head, int val, int index) {
 
     node_t *new_node;
     new_node = malloc(sizeof(node_t));
+    if(NULL == new_node){
+        //to avoid SEGFAULT
+        return -1;
+    }
     new_node->val = val;
     new_node->next = current->next;
     current->next = new_node;
@@ -143,11 +160,16 @@ int remove_by_index(node_t **head, int index) {
     }
 
     int retval = -1;
+
+    if(head == NULL || *head == NULL){
+        //avoids horrible SEGFAULT if head or *head is NULL
+        return retval;
+    }
     node_t * current = *head;
     node_t * temp_node = NULL;
 
     for (int i = 0; i < index-1; i++) {
-        if (current->next == NULL) {
+        if (NULL == current->next) {
             return -1;
         }
         current = current->next;
@@ -171,14 +193,12 @@ int remove_by_value(node_t **head, int val) {
     if (*head == NULL) {
         return -1;
     }
-    omp_set_lock(&((*head)->lock));
 
     if ((*head)->val == val) {
-        omp_unset_lock(&((*head)->lock));
         return pop(head);
     }
-
     previous = *head;
+    omp_set_lock(&(previous->lock));
     current = (*head)->next;
     omp_set_lock(&(current->lock));
     while (current != NULL) {
