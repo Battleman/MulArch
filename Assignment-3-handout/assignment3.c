@@ -77,7 +77,7 @@ void append(node_t *head, int val) {
     }
     current->next->val = val;
     current->next->next = NULL;
-    omp_unset_lock(&(current->lock))
+    omp_unset_lock(&(current->lock));
 }
 
 /*
