@@ -39,13 +39,14 @@ void print_list(node_t *head) {
     node_t *current = head;
     omp_set_lock(&(current->lock));
     while (current != NULL) {
-        printf("%d\n", current->val);
+        printf("%d --> ", current->val);
         if(current->next != NULL){
             omp_set_lock(&((current->next)->lock));
         }
         omp_unset_lock(&(current->lock));
         current = current->next;
     }
+    printf("NULL\n");
 }
 
 /*
@@ -54,10 +55,15 @@ void print_list(node_t *head) {
 int count(node_t *head)
 {
     node_t *current = head;
+    omp_set_lock(&(current->lock));
     int count = 0;
 
     while (current != NULL) {
         count++;
+        if(current->next != NULL){
+            omp_set_lock(&((current->next)->lock));
+        }
+        omp_unset_lock(&(current->lock));
         current = current->next;
     }
 
@@ -95,6 +101,8 @@ void add_first(node_t **head, int val){
     if(NULL == head || NULL == *head || val == -1){
         return;
     }
+
+    //node preparation
     node_t *new_node;
     new_node = malloc(sizeof(node_t));
     if(NULL == new_node){
@@ -102,13 +110,16 @@ void add_first(node_t **head, int val){
     }
     new_node->val = val;
     omp_init_lock(&(new_node->lock));
+
+    //head update
     node_t* prev_head = *head;
     while(omp_test_lock(&(prev_head->lock))){
-      prev_head = *head;
+        //iterate until you obtain the correct (and free) head
+        prev_head = *head;
     }
     new_node->next = prev_head;
-    *head = new_node;
-    omp_unset_lock(&(prev_head->lock));
+    *head = new_node; //update head of list
+    omp_unset_lock(&(prev_head->lock)); //only AFTER, you unlock previous head
 }
 
 /*
@@ -160,11 +171,17 @@ int pop(node_t **head) {
     if (*head == NULL) {
         return -1;
     }
-
-    next_node = (*head)->next;
-    retval = (*head)->val;
-    free(*head);
-    *head = next_node;
+    node_t* prev_head = *head;
+    while(omp_test_lock(&(prev_head->lock))){
+        //if head is busy (maybe being updated), update
+        //until head is free
+        prev_head = *head;
+    }
+    next_node = prev_head->next;
+    *head = next_node; //update head
+    retval = prev_head->val;
+    omp_unset_lock(&(prev_head->lock));
+    free(prev_head);
 
     return retval;
 }
@@ -268,12 +285,16 @@ int search_by_value(node_t *head, int val) {
     if (current == NULL) {
         return -1;
     }
-
+    omp_set_lock(&(current->lock));
     while (current) {
         if (current->val == val) {
+            omp_unset_lock(&(current->lock));
             return index;
         }
-
+        if(current->next != NULL){
+            omp_set_lock(&((current->next)->lock));
+        }
+        omp_unset_lock(&(current->lock));
         current  = current->next;
         index++;
     }
@@ -315,21 +336,20 @@ int main(void) {
     omp_init_lock(&head_lock);
     node_t *test_list;
     init_list(&test_list, 2);
-    printf("Done init\n");
 
     add_first(&test_list, 1);
-    printf("Done add_first\n");
 
     append(test_list, 3);
     append(test_list, 4);
     append(test_list, 5);
-    printf("Done 3 add\n");
+    print_list(test_list);
     printf("Count = %d\n", count(test_list));
-    remove_by_index(&test_list, 2);
+    printf("Removed index 2 : %d\n",remove_by_index(&test_list, 2));
     printf("Count = %d\n", count(test_list));
 
+    printf("Removed index 100 : %d\n",remove_by_index(&test_list, 100));
     printf("Search for 5 -> index = %d\n", search_by_value(test_list, 5));
-    remove_by_value(&test_list, 5);
+    printf("Remove value 5 : %d\n", remove_by_value(&test_list, 5));
     printf("Search for 5 -> index = %d\n", search_by_value(test_list, 5));
 
     print_list(test_list);
