@@ -84,6 +84,7 @@ void append(node_t *head, int val) {
     }
     current->next->val = val;
     current->next->next = NULL;
+    omp_init_lock(&((current->next)->lock));
     omp_unset_lock(&(current->lock));
 }
 
@@ -100,6 +101,7 @@ void add_first(node_t **head, int val){
         return;
     }
     new_node->val = val;
+    omp_init_lock(&(new_node->lock));
     node_t* prev_head = *head;
     while(omp_test_lock(&(prev_head->lock))){
       prev_head = *head;
@@ -287,18 +289,19 @@ void delete_list(node_t **head) {
       //probable cause : the list has already been deleted; don't proceed.
       return;
     }
-    omp_set_lock(&((*head)->lock));
     node_t *current = *head;
+    omp_set_lock(&(current->lock));
     *head = NULL; //avoids any program to execute after this is called
     node_t *next;
 
     while (current) {
         next = current->next;
-        omp_set_lock(&(next->lock));
+        if(next != NULL){
+            omp_set_lock(&(next->lock));
+        }
         omp_unset_lock(&(current->lock));
         free(current);
         current = next;
-        omp_set_lock(&(current->lock));
     }
 }
 
