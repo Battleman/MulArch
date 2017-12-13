@@ -14,5 +14,3 @@ implementation.o: implementation.cu
 
 clean:
 	rm -f *.o assignment4
-
-

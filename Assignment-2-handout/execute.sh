@@ -6,9 +6,9 @@
 #SBATCH --mem 1G
 #SBATCH --reservation cs307cpu
 
-threads=4
-length=500
-iterations=1
+threads=8
+length=1100
+iterations=10000
 output="output.csv"
 
 ./assignment2 $threads $length $iterations $output

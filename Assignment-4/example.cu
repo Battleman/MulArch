@@ -1,4 +1,4 @@
-/* 
+/*
  *
  *  CUDA Example
  *
@@ -21,6 +21,7 @@ void incrementArrayOnHost(float *a, int N)
 
 __global__ void incrementArrayOnDevice(float *a, int N)
 {
+	constant
 	int idx = blockIdx.x*blockDim.x + threadIdx.x;
 	a[idx] = a[idx]+5.f;
 }
@@ -38,7 +39,7 @@ int main(void)
 
 	cudaSetDevice(0);
 
-	// allocate array on device 
+	// allocate array on device
 	if (cudaMalloc((void **) &a_d, size) != cudaSuccess)
 		cout << "error in cudaMalloc" << endl;
 
@@ -66,7 +67,7 @@ int main(void)
 	// cleanup
 	free(a_h); 
 	free(b_h);
-	cudaFree(a_d); 
+	cudaFree(a_d);
 
 	return 0;
 }

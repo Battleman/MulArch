@@ -17,7 +17,7 @@ void set_clock()
 double elapsed_time()
 {
     gettimeofday(&end, NULL);
-    double elapsed = (end.tv_sec - start.tv_sec); 
+    double elapsed = (end.tv_sec - start.tv_sec);
     elapsed += (double)(end.tv_usec - start.tv_usec) / 1000000.0;
     return elapsed;
 }
@@ -41,7 +41,7 @@ void save(double *x, int length)
     {
         for(int j=0; j<length-1; j++)
             output_file<<setprecision(4)<<x[i*length+j]<<";";
-        output_file<<setprecision(4)<<x[i*length+length-1]<<";"<<endl;
+        output_file<<setprecision(4)<<x[i*length+length-1]<<endl;
     }
     output_file.close();
 }

@@ -52,8 +52,14 @@ int main (int argc, const char *argv[]) {
     /*Use either the CPU or the GPU functions*/
 
     //CPU Baseline
-    //array_process(input, output, length, iterations);
-
+    // array_process(input, output, length, iterations);
+    // if(iterations%2==1)
+    // {
+    //   temp = input;
+    //   input = output;
+    //   output = temp;
+    // }
+    
     //GPU function
     GPU_array_process(input, output,  length, iterations);
 
